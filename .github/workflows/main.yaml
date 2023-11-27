@@ -7,6 +7,9 @@ on:
 
 env:
   IMAGE_NAME: demo2711
+  AKS_CLUSTER: demo
+  AKS_RESOURCE_GROUP: aks-demo-alb-rg
+  AKS_NAMESPACE: demo2711
 
 jobs:
   build:
@@ -38,3 +41,16 @@ jobs:
         context: .
         push: true
         tags: ghcr.io/${{ github.repository }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+    - name: Login in Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set AKS context
+      run: az aks get-credentials --resource-group ${{ env.AKS_RESOURCE_GROUP }} --name ${{ env.AKS_CLUSTER }}
+
+    - name: Deploy to AKS
+      run: sed -e "s/#imageTag#/$${{ github.sha }}/g" k8s/application.yaml |
+        kubectl apply -f - -n ${{ env.AKS_NAMESPACE }}
+

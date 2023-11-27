@@ -10,7 +10,7 @@ public class HelloWorldController {
     @GetMapping("/hello")
     public String helloWorld() {
         System.out.println("Received request for /hello");
-        String response = "Hello, World!";
+        String response = "Hello, Santander!";
         System.out.println("Sending response: " + response);
         return response;
     }
